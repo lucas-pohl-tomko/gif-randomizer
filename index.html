@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lucas's Epic Gif Randomizer</title>
+    <style>
+        body {
+            background-color: #000;
+        }
+        button{
+            font-size: 1rem;
+            padding: .5rem;
+        }
+        select{
+            padding: .5rem;
+            font-size: 1rem;
+        }
+        #loader {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: auto;
+            /* background-image: url("https://64.media.tumblr.com/d2a13e1379f282c203345e6839d8be23/3180409a2cbe85c0-88/s500x750/db200d8b8c81e7294610fce6f7088cf6dfad0b27.gif"); */
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 100%;
+        }
+        #gif-wrap {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: auto;
+            background-color: #000;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0%;
+        }
+        .text-input {
+            background-color: #000;
+            color: #fff;
+            font-size: 1rem;
+            padding: .5rem;
+        }
+        .invisible-menu {
+            width: 90vw;
+            height: 20vh;
+            opacity: 0%;
+            transition: ease-in 0.3s;
+            position: absolute;
+            z-index: 3;
+        }
+
+        .invisible-menu:hover {
+            opacity: 100%;
+        }
+        .loadCount {
+            font-size: 1rem;
+            padding: .5rem;
+            background-color: #fff;
+            display: inline-block;
+            width: 7rem;
+            height: 1rem;
+            margin: .1rem;
+            margin-left: .3rem;
+        }
+        .label {
+            font-size: 1rem;
+            padding: .5rem;
+            background-color: rgb(153, 153, 153);
+            position: absolute;
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            overflow: hidden;
+            margin: .1rem;
+            margin-left: .3rem;
+        }
+        .label:hover {
+            background-color: #fff;
+            width: auto;
+            height: auto;
+            min-width: 10rem;
+            max-height: 10rem;
+            overflow: scroll;
+            transition: ease-out 1s;
+        }
+        .greenText {
+            color: rgb(40, 124, 40);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="fullscreen">
+        <div id="vueApp">
+            <div class="glow">
+                <form @submit.prevent="startGifQueue" class="invisible-menu">
+                    <button type="submit">
+                        <i>{{buttonLabel}}</i>
+                    </button>
+                    <input v-model="search" class="text-input" placeholder="Search Gifs" type="text" id="tag1" />
+                    <input v-model="gifTime" class="text-input" placeholder="Duration. Minimun 4000ms" min="2500"
+                        type="number" id="duration" value="5000" />
+
+                    <select v-model="gifApi" name="api" id="api">
+                        <option value="giphy">Giphy</option>
+                        <option value="tenor">Tenor</option>
+                    </select>
+                    <button onclick="requestFullScreen()">
+                        <i>Fullscreen</i>
+                    </button>
+                    <div class="loadCount" :class="finishedLoadingStack ? 'greenText' : '' ">
+                        Gifs Loaded... {{gifs.length}}
+                    </div>
+                    <div class="label">
+                        <div v-for="(g,index) in gifs"> <a :href="g" target="_blank"><img :src="g"
+                                    style="width: 5rem; height: 5rem;" alt="" srcset=""> {{g}}</a> </div>
+                    </div>
+                </form>
+            </div>
+            <img :src="gif" id="gif-wrap" style="width: auto; height: 100%">
+            <img src="https://64.media.tumblr.com/d2a13e1379f282c203345e6839d8be23/3180409a2cbe85c0-88/s500x750/db200d8b8c81e7294610fce6f7088cf6dfad0b27.gif"
+                id="loader" style="width: auto; height: 100%"></img>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-app.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBgMUvQ4Zi1hVAR8X8dJPiKd3qj4Gg-a8U",
+            authDomain: "gif-randomizer.firebaseapp.com",
+            projectId: "gif-randomizer",
+            storageBucket: "gif-randomizer.appspot.com",
+            messagingSenderId: "1041126969996",
+            appId: "1:1041126969996:web:26db78ac4e3df85462e1a9",
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.min.js"
+        integrity="sha512-odNmoc1XJy5x1TMVMdC7EMs3IVdItLPlCeL5vSUPN2llYKMJ2eByTTAIiiuqLg+GdNr9hF6z81p27DArRFKT7A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        new Vue({
+            el: '#vueApp',
+            data: {
+                message: 'poggers',
+                gif: null,
+                gifs: [],
+                search: '',
+                gifTime: 5000,
+                gifApi: 'giphy',
+                visible: 'visible',
+                buttonLabel: 'Get Gifs',
+                finishedLoadingStack: false
+            },
+            methods: {
+                startGifQueue() {
+                    this.buttonLabel = 'Reload Gif Stack'
+                    var highestTimeoutId = setTimeout(";");
+                    for (var i = 0; i < highestTimeoutId; i++) {
+                        clearTimeout(i);
+                    }
+                    this.finishedLoadingStack = false
+                    this.gifs = []
+
+                    const $gif_wrap = $("#gif-wrap")
+                    const $loader = $("#loader")
+                    $gif_wrap.css({
+                        opacity: "0%",
+                    })
+                    $loader.css({
+                        opacity: "100%",
+                    })
+                    setInterval(() => {
+                        console.log('gif:', this.search, this.gifs, this.gifTime, this.gifApi)
+                        if (this.gifs.length > 2) {
+                            this.finishedLoadingStack = true
+                        }
+                        if (this.gifs.length < 20) {
+                            if (this.gifApi === 'giphy') {
+                                this.getGiphy(this.search).then((gif) => {
+                                    fetch(gif).then((response) => {
+                                        return response.blob()
+                                    }).then((gifBlob) => {
+                                        this.gifs.push(URL.createObjectURL(gifBlob))
+                                    })
+                                })
+
+                            } else {
+                                this.getTenor(this.search).then((gif) => {
+                                    fetch(gif).then((response) => {
+                                        return response.blob()
+                                    }).then((gifBlob) => {
+                                        this.gifs.push(URL.createObjectURL(gifBlob))
+                                    })
+                                })
+                            }
+                        }
+                    }, 2500)
+                    setInterval(() => {
+                        if (this.finishedLoadingStack) {
+                            this.unstackGif()
+                            console.log(this.gif)
+                        }
+                    }, this.gifTime)
+                },
+
+                unstackGif() {
+                    const $gif_wrap = $("#gif-wrap")
+                    const $loader = $("#loader")
+                    if (this.gifs.length > 1) {
+                        $gif_wrap.css({
+                            opacity: "100%",
+                        })
+                        $loader.css({
+                            opacity: "0%",
+                        })
+                        this.gif = this.gifs.shift()
+                    } else {
+                        $gif_wrap.css({
+                            opacity: "0%",
+                        })
+                        $loader.css({
+                            opacity: "100%",
+                        })
+                    }
+                },
+                async getTenor(searchTerm) {
+                    let tenor = {
+                        baseURL: "https://g.tenor.com/v1/random",
+                        apiKey: "VBSRKTU623TY",
+                        tag: searchTerm,
+                    };
+                    try {
+                        const response = await axios.get(
+                            tenor.baseURL,
+                            {
+                                params: {
+                                    q: tenor.tag,
+                                    key: tenor.apiKey,
+                                    limit: '50',
+                                    ar_range: 'wide'
+                                },
+                            }
+                        );
+                        console.log('response.data.results[0].media[0].gif', response.data.results[0].media[0].gif);
+                        return response.data.results[0].media[0].gif.url;
+                    } catch (error) {
+                        console.error(error);
+                    }
+                },
+                async getGiphy(tag) {
+                    let giphy = {
+                        baseURL: "https://api.giphy.com/v1/gifs/",
+                        apiKey: "0UTRbFtkMxAplrohufYco5IY74U8hOes",
+                        tag: tag,
+                        // type: "search?q=",
+                        type: "random",
+                    };
+                    try {
+                        const response = await axios.get(
+                            giphy.baseURL + giphy.type,
+                            {
+                                params: {
+                                    tag: giphy.tag,
+                                    key: giphy.apiKey,
+                                },
+                            }
+                        );
+                        console.log(response.data.data.images.original.url);
+                        return response.data.data.images.original.url;
+                    } catch (error) {
+                        console.error(error);
+                    }
+                },
+
+            },
+
+        })
+        // Suporte para fullscreen
+        function requestFullScreen() {
+            // Supports most browsers and their versions.
+            let element = document.getElementById("fullscreen");
+            var requestMethod =
+                element.requestFullScreen ||
+                element.webkitRequestFullScreen ||
+                element.mozRequestFullScreen ||
+                element.msRequestFullScreen;
+
+            if (requestMethod) {
+                // Native full screen.
+                requestMethod.call(element);
+            } else if (typeof window.ActiveXObject !== "undefined") {
+                // Older IE.
+                var wscript = new ActiveXObject("WScript.Shell");
+                if (wscript !== null) {
+                    wscript.SendKeys("{F11}");
+                }
+            }
+        }
+
+        var elem = document.body; // Make the body go full screen.
+        requestFullScreen(elem);
+    </script>
+</body>
+
+</html>
