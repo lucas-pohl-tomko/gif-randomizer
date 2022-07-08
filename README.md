@@ -3,7 +3,7 @@
 This is a single html file that runs a Vue.js instance, it takes the text from the input and starts querying Gifs from one of two popular gif APIs. Then after 3 gifs are loaded, it starts displaying gifs until you reload or restart the gif queue by changing a parameter and pressing enter or pressing the Reload Gif Stack button! 5000ms of gif display time is recomended so the gif stack always full.
 
 # Online Version
-[gif-randomizer :sparkles: ](gif-randomizer.web.app)
+[gif-randomizer :sparkles: ](https://gif-randomizer.web.app)
 
 # Gif Queue Logic
 📖 The queueing doesnt start until you write something and press enter or just press the Get Gifs button (in that case it will really get random gifs).
