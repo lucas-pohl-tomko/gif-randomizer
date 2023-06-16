@@ -6,18 +6,36 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lucas's Epic Gif Randomizer</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
             background-color: #000;
+            overflow: hidden;
         }
-        button{
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .psy-select {
+            box-shadow: #3ce7e7 2px 2px 10px 2px;
+            padding: 0.5rem;
+            border-radius: 10px;
             font-size: 1rem;
-            padding: .5rem;
+            cursor: pointer;
         }
-        select{
-            padding: .5rem;
-            font-size: 1rem;
-        }
+
         #loader {
             position: absolute;
             top: 0;
@@ -31,12 +49,14 @@
             background-position: center;
             opacity: 100%;
         }
+
         #gif-wrap {
             position: absolute;
             top: 0;
             bottom: 0;
             left: 0;
             right: 0;
+            overflow: hidden;
             margin: auto;
             background-color: #000;
             background-size: contain;
@@ -44,48 +64,75 @@
             background-position: center;
             opacity: 0%;
         }
-        .text-input {
+
+        .psy-text-input {
+            border-radius: 10px;
+            box-shadow: #3ce7e7 2px 2px 10px 2px;
             background-color: #000;
             color: #fff;
             font-size: 1rem;
-            padding: .5rem;
+            padding: 0.5rem;
         }
+
         .invisible-menu {
-            width: 90vw;
-            height: 20vh;
+            top: 0;
+            left: 0;
+            width: 80%;
+            height: 50vh !important;
             opacity: 0%;
-            transition: ease-in 0.3s;
+            /* transition: ease-in 0.3s; */
             position: absolute;
             z-index: 3;
         }
 
         .invisible-menu:hover {
+            /* height: 20vh; */
             opacity: 100%;
+            animation: comingFromCeiling 0.4s ease-out;
         }
-        .loadCount {
-            font-size: 1rem;
-            padding: .5rem;
-            background-color: #fff;
-            display: inline-block;
-            width: 7rem;
-            height: 1rem;
-            margin: .1rem;
-            margin-left: .3rem;
+
+        /* 
+        .psy-glow {
+            width: fit-content;
+            height: fit-content;
+            background: linear-gradient(90deg, #7fe771, #3ce7e7, #23a6d5, #d523b7);
+            background-size: 500% 500%;
+            animation: gradient 7s ease infinite;
+            border-radius: 10px;
+        } */
+
+        .load-count {
+            /* font-size: 1rem; */
+            /* border-radius: 10px; */
+            /* padding: .6rem; */
+            box-shadow: #3ce7e7 2px 2px 10px 2px;
+            /* display: inline-block; */
+            /* width: 7rem; */
+            /* height: 1rem; */
+            /* margin: .1rem; */
+            /* margin-left: .3rem; */
+            cursor: default;
+            padding-top: 1.6rem;
         }
+
         .label {
-            font-size: 1rem;
-            padding: .5rem;
-            background-color: rgb(153, 153, 153);
-            position: absolute;
-            display: inline-block;
+            font-size: 1.2rem;
+            padding: 0.6rem;
+            box-shadow: #3ce7e7 2px 2px 10px 2px;
+            background-color: black;
+
+            /* position: absolute; */
+            display: block;
             width: 1rem;
             height: 1rem;
             overflow: hidden;
-            margin: .1rem;
-            margin-left: .3rem;
+            margin: 0.1rem;
+            margin-left: 0.3rem;
         }
+
         .label:hover {
             background-color: #fff;
+            cursor: pointer;
             width: auto;
             height: auto;
             min-width: 10rem;
@@ -93,8 +140,87 @@
             overflow: scroll;
             transition: ease-out 1s;
         }
+
+        @keyframes comingFromCeiling {
+            from {
+                top: -20vh;
+                left: -20vh;
+                height: 50vh;
+            }
+
+            to {
+                top: 0vh;
+            }
+        }
+
         .greenText {
             color: rgb(40, 124, 40);
+        }
+
+        .menu {
+            top: 0;
+            left: 0;
+            /* background-color: #40c79c; */
+            display: flex;
+            justify-content: start;
+            /* min-width: 100%; */
+            position: absolute;
+            z-index: 3;
+            border-bottom-left-radius: 40px;
+            border-bottom-right-radius: 40px;
+            height: 10vh;
+        }
+
+        .menuOption {
+            margin: 1rem;
+            margin-top: 0;
+            width: 20vh;
+            border: 1px solid black;
+            border-bottom-left-radius: 40px;
+            border-bottom-right-radius: 40px;
+            box-shadow: #3ce7e7 2px 2px 10px 6px;
+            /* display: flex; */
+            /* justify-content: center; */
+            background-color: black;
+            color: white;
+        }
+
+        .roundInput {
+            font-size: 1.4rem;
+            /* padding: 1vw; */
+            padding-left: 1rem;
+            padding-right: 1rem;
+            display: flex;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .roundSelect {
+            width: 8vw;
+            height: 5vh;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        .psy-button {
+            font-size: 1.2rem;
+            font-weight: bold;
+            align-items: center;
+            overflow: hidden;
+            font-style: oblique;
+            padding: 0.5rem;
+            color: rgb(0, 0, 0);
+            background: linear-gradient(90deg,
+                    #7fe771,
+                    #3ce7e7,
+                    #23a6d5,
+                    #d523b7);
+            background-size: 500% 500%;
+            animation: gradient 7s ease infinite;
+        }
+
+        .psy-button:hover {
+            cursor: pointer;
         }
     </style>
 </head>
@@ -102,32 +228,33 @@
 <body>
     <div id="fullscreen">
         <div id="vueApp">
-            <div class="glow">
-                <form @submit.prevent="startGifQueue" class="invisible-menu">
-                    <button type="submit">
+            <nav class="navbarWrapper container m-3" tabindex="0" v-if="!fullscreenActive">
+                <form @submit.prevent="startGifQueue" class="md:flex md:justify-evenly flex-column columns-1">
+                    <button
+                        class="rounded-full w-1/3 md:w-1/5 sm:p-0 md:p-1 sm:text-sm md:text-xl mx-5 bg-gradient-to-r from-indigo-500 hover:from-indigo-400">
                         <i>{{buttonLabel}}</i>
                     </button>
-                    <input v-model="search" class="text-input" placeholder="Search Gifs" type="text" id="tag1" />
-                    <input v-model="gifTime" class="text-input" placeholder="Duration. Minimun 4000ms" min="2500"
-                        type="number" id="duration" value="5000" />
-
-                    <select v-model="gifApi" name="api" id="api">
-                        <option value="giphy">Giphy</option>
-                        <option value="tenor">Tenor</option>
+                    <input v-model="search"
+                        class="m-2 w-1/6 container md:w-1/5 columns-3 bg-indigo-300 rounded-full p-2 text-black placeholder:text-black"
+                        placeholder="Search Gifs" type="text" />
+                    <div
+                        class="m-2 w-1/6 flex md:w-1/5 container bg-indigo-300 rounded-full p-2 text-black placeholder:text-black">
+                        <input v-model="gifTime" class="lg:ps-12 container bg-sky-500/0 text-black"
+                            placeholder="Duration. Minimun 4000ms" min="2500" type="number" />
+                        <div class="text-black block sm:hidden lg:block">ms</div>
+                    </div>
+                    <select class="rounded-full w-1/4 md:w-1/5 sm:p-0 md:p-1 text-black sm:text-sm md:text-xl m-2 bg-gradient-to-r from-indigo-500 hover:from-indigo-400" v-model="gifApi">
+                        <option name="" value="giphy">
+                            Giphy</option>
+                        <option value="tenor">tenor</option>
                     </select>
-                    <button onclick="requestFullScreen()">
+                    <button class="rounded-full w-1/3 md:w-1/5 sm:p-0 md:p-1 sm:text-sm md:text-xl m-2 bg-gradient-to-r from-indigo-500 hover:from-indigo-400" type="button" onclick="requestFullScreen()">
                         <i>Fullscreen</i>
                     </button>
-                    <div class="loadCount" :class="finishedLoadingStack ? 'greenText' : '' ">
-                        Gifs Loaded... {{gifs.length}}
-                    </div>
-                    <div class="label">
-                        <div v-for="(g,index) in gifs"> <a :href="g" target="_blank"><img :src="g"
-                                    style="width: 5rem; height: 5rem;" alt="" srcset=""> {{g}}</a> </div>
-                    </div>
+                    <p class="rounded-full w-1/3 md:w-1/5 sm:p-0 md:p-1 sm:text-xs md:text-xl mx-5 bg-gradient-to-r from-indigo-500 hover:from-indigo-400 ">Gifs Loaded... {{gifs.length}}</p>
                 </form>
-            </div>
-            <img :src="gif" id="gif-wrap" style="width: auto; height: 100%">
+            </nav>
+            <img :src="gif" id="gif-wrap" style="z-index: 10; width: auto; height: 100%" />
             <img src="https://64.media.tumblr.com/d2a13e1379f282c203345e6839d8be23/3180409a2cbe85c0-88/s500x750/db200d8b8c81e7294610fce6f7088cf6dfad0b27.gif"
                 id="loader" style="width: auto; height: 100%"></img>
         </div>
@@ -135,93 +262,130 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-app.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBgMUvQ4Zi1hVAR8X8dJPiKd3qj4Gg-a8U",
+            authDomain: "gif-randomizer.firebaseapp.com",
+            projectId: "gif-randomizer",
+            storageBucket: "gif-randomizer.appspot.com",
+            messagingSenderId: "1041126969996",
+            appId: "1:1041126969996:web:26db78ac4e3df85462e1a9",
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.min.js"
         integrity="sha512-odNmoc1XJy5x1TMVMdC7EMs3IVdItLPlCeL5vSUPN2llYKMJ2eByTTAIiiuqLg+GdNr9hF6z81p27DArRFKT7A=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/kute.js/2.2.2/kute.min.js"
+        integrity="sha512-ggD4QBjUnITp5fa5Hq0qzaea2olsTpxwxPHrhF2lIXANHagX3mLrsEdyKNDRKxBlZ2sknQ/mEmLk0ojHN+dhzQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
         new Vue({
-            el: '#vueApp',
+            el: "#vueApp",
             data: {
-                message: 'poggers',
+                message: "poggers",
                 gif: null,
                 gifs: [],
-                search: '',
+                search: "",
                 gifTime: 5000,
-                gifApi: 'giphy',
-                visible: 'visible',
-                buttonLabel: 'Get Gifs',
-                finishedLoadingStack: false
+                gifApi: "giphy",
+                visible: "visible",
+                buttonLabel: "Get Gifs",
+                finishedLoadingStack: false,
+                fullscreenActive: false
             },
             methods: {
                 startGifQueue() {
-                    this.buttonLabel = 'Reload Gif Stack'
+                    this.buttonLabel = "Reload Gif Stack";
                     var highestTimeoutId = setTimeout(";");
                     for (var i = 0; i < highestTimeoutId; i++) {
                         clearTimeout(i);
                     }
-                    this.finishedLoadingStack = false
-                    this.gifs = []
+                    this.finishedLoadingStack = false;
+                    this.gifs = [];
 
-                    const $gif_wrap = $("#gif-wrap")
-                    const $loader = $("#loader")
+                    const $gif_wrap = $("#gif-wrap");
+                    const $loader = $("#loader");
                     $gif_wrap.css({
                         opacity: "0%",
-                    })
+                    });
                     $loader.css({
                         opacity: "100%",
-                    })
+                    });
                     setInterval(() => {
-                        console.log('gif:', this.search, this.gifs, this.gifTime, this.gifApi)
+                        console.log(
+                            "gif:",
+                            this.search,
+                            this.gifs,
+                            this.gifTime,
+                            this.gifApi
+                        );
                         if (this.gifs.length > 2) {
-                            this.finishedLoadingStack = true
+                            this.finishedLoadingStack = true;
                         }
                         if (this.gifs.length < 20) {
-                            if (this.gifApi === 'giphy') {
+                            if (this.gifApi === "giphy") {
                                 this.getGiphy(this.search).then((gif) => {
-                                    fetch(gif).then((response) => {
-                                        return response.blob()
-                                    }).then((gifBlob) => {
-                                        this.gifs.push(URL.createObjectURL(gifBlob))
-                                    })
-                                })
-
+                                    fetch(gif)
+                                        .then((response) => {
+                                            return response.blob();
+                                        })
+                                        .then((gifBlob) => {
+                                            this.gifs.push(
+                                                URL.createObjectURL(gifBlob)
+                                            );
+                                        });
+                                });
                             } else {
                                 this.getTenor(this.search).then((gif) => {
-                                    fetch(gif).then((response) => {
-                                        return response.blob()
-                                    }).then((gifBlob) => {
-                                        this.gifs.push(URL.createObjectURL(gifBlob))
-                                    })
-                                })
+                                    fetch(gif)
+                                        .then((response) => {
+                                            return response.blob();
+                                        })
+                                        .then((gifBlob) => {
+                                            this.gifs.push(
+                                                URL.createObjectURL(gifBlob)
+                                            );
+                                        });
+                                });
                             }
                         }
-                    }, 2500)
+                    }, 2500);
                     setInterval(() => {
                         if (this.finishedLoadingStack) {
-                            this.unstackGif()
-                            console.log(this.gif)
+                            this.unstackGif();
+                            console.log(this.gif);
                         }
-                    }, this.gifTime)
+                    }, this.gifTime);
                 },
 
                 unstackGif() {
-                    const $gif_wrap = $("#gif-wrap")
-                    const $loader = $("#loader")
+                    const $gif_wrap = $("#gif-wrap");
+                    const $loader = $("#loader");
                     if (this.gifs.length > 1) {
                         $gif_wrap.css({
                             opacity: "100%",
-                        })
+                        });
                         $loader.css({
                             opacity: "0%",
-                        })
-                        this.gif = this.gifs.shift()
+                        });
+                        this.gif = this.gifs.shift();
                     } else {
                         $gif_wrap.css({
                             opacity: "0%",
-                        })
+                        });
                         $loader.css({
                             opacity: "100%",
-                        })
+                        });
                     }
                 },
                 async getTenor(searchTerm) {
@@ -231,18 +395,18 @@
                         tag: searchTerm,
                     };
                     try {
-                        const response = await axios.get(
-                            tenor.baseURL,
-                            {
-                                params: {
-                                    q: tenor.tag,
-                                    key: tenor.apiKey,
-                                    limit: '50',
-                                    ar_range: 'wide'
-                                },
-                            }
+                        const response = await axios.get(tenor.baseURL, {
+                            params: {
+                                q: tenor.tag,
+                                key: tenor.apiKey,
+                                limit: "50",
+                                ar_range: "wide",
+                            },
+                        });
+                        console.log(
+                            "response.data.results[0].media[0].gif",
+                            response.data.results[0].media[0].gif
                         );
-                        console.log('response.data.results[0].media[0].gif', response.data.results[0].media[0].gif);
                         return response.data.results[0].media[0].gif.url;
                     } catch (error) {
                         console.error(error);
@@ -272,13 +436,12 @@
                         console.error(error);
                     }
                 },
-
             },
-
-        })
+        });
         // Suporte para fullscreen
         function requestFullScreen() {
             // Supports most browsers and their versions.
+            fullscreenActive = true
             let element = document.getElementById("fullscreen");
             var requestMethod =
                 element.requestFullScreen ||
@@ -301,6 +464,7 @@
         var elem = document.body; // Make the body go full screen.
         requestFullScreen(elem);
     </script>
+    <script src="select.js"></script>
 </body>
 
 </html>
